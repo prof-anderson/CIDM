@@ -1,0 +1,309 @@
+---
+title: "Cochlear Implant Decision Making"
+author: "Tim Anderson"
+format: pdf
+editor: visual
+---
+
+\-\--
+
+title: "Revisiting Selecting Medical Hardware Using Pairwise Comparisons"
+
+author: "Tim Anderson"
+
+format: pdf
+
+editor: visual
+
+\-\--
+
+\# Cochlear Implant Decision Making
+
+In 2016, \[Anderson and Jahromi\](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making from a patient's perspective using hierarchical decision making. This paper revisits this decision using analytical hierarchy process with currently available devices. The model is also simplified and the analysis is done using packages in R as a Quarto markdown document.
+
+\## Background
+
+The earlier PICMET paper used 8 characteristics divided into three categories:
+
+\- Performance
+
+ - Current Implant Technology
+
+ - Main External Processor Unit
+
+ - Main External Unit's Ingress Protection (IP Rating)
+
+\- Accessories
+
+ - Secondary External Process Unit
+
+ - Connection Options
+
+ - Bonuses
+
+\- Future Issues
+
+ - Future Implant Capability
+
+ - Warranty and Reliability
+
+This paper simplifies the model to just four characteristics of a cochlear implant system.
+
+\- \*\*Implant:\*\* Technology for internally implanted device's current capabilities. While anecdotal comments and studies do not appear to find clear differences in success outcomes by manufacturers, the technologies are different.
+
+\- \*\*Flexibility:\*\* Variety of benefits for the device, including flexibility such as off-the-ear versus on--the-ear for an alternative external processor. It is important to use the device and throughout the day to help the brain adapt to the new way of hearing. For users with eyeglasses and mask wearing, an off the ear processor option can be a very useful option.
+
+\- \*\*Connectivity:\*\* This reflects the general connectivity capabilities of the current processor(s) such as direct Bluetooth with requiring additional devices, and Auracast (a newly announced multipoint Bluetooth capability).
+
+\- \*\*Future:\*\* Anticipated future prospects both in terms of company commitment and the opportunity for future processors to leverage more capabilities of the implant.
+
+Some other factors to consider might include comfort for wearing, battery life, frequency of recalls, commitment to support out of warranty products, support community, familiarity of clinic/surgeon with the manufacturer.
+
+\## Analysis
+
+Let's start by loading two packages. The first, \`ahpsurvey\`, is for doing Analytic Hierarchy Process and is designed with an emphasis on incorporating many decision makers. The second package, \`kableExtra\`, is for doing better formatted tables.
+
+\`\`\`{r}
+
+library (ahpsurvey)
+
+library (kableExtra)
+
+\`\`\`
+
+First we will construct the data comparing the relative attributes.
+
+\`\`\`{r}
+
+atts \<- c("impl", "flex", "conn", "fut")
+
+matA \<- matrix(c(-2,-2,-2,1,2,2), ncol=6)
+
+colnames (matA) \<- c("imp_flex", "imp_conn",
+
+"impl_fut", "flex_conn",
+
+"flex_fut", "conn_fut")
+
+kbl(matA , booktabs=T,
+
+caption="Patient's preferences of characteristics.") \|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+The \`ahp\` command takes a matrix, in this case \`matA\`, of decision maker information describing the relative importance for the decision maker of each characteristic. For example, the value of \`conn_fut\` reflects a comparison of Connectivity to Future Capabilities of 2 indicates that
+
+\`\`\`{r}
+
+matAr \<- ahpsurvey::ahp(matA,
+
+atts=atts,
+
+negconvert=FALSE, \# Default of FALSE
+
+reciprocal=TRUE, \# Defauult of TRUE
+
+method="eigen", \# Default of Eigenvalue
+
+aggmethod="geometric", \# Default Geometric mean
+
+)
+
+kbl (matAr, booktabs=T,
+
+caption="Patient's preferences of characteristics.") \|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+Just as there was in 2016, there are three United States FDA approved cochlear implant manufacturers: Advanced Bionics, Cochlear, and Med-El. The result is that for US patients, it typically is a choice between just these three manufacturers although sometimes one or two manufactures are not options due to patient's unique clinical characteristics, insurance coverage, or clinic limitations.
+
+The patient's decision is then two-fold, first whether to get a cochlear implant and secondly which manufacturer to select. A third decision could be which device to select since each manufacturer offers a standard behind-the-ear (BTE) device processor and then a secondary off-the-ear (OTE) processor option.
+
+The processor devices are summarized below
+
+\- Advanced Bionics
+
+ - BTE: \*\*Naida M90\*\* was approved by the FDA in 2020 and is the only cochlear implant that fully supports Bluetooth phone calls, including the speaker's voice.
+
+ - OTE: \*\*Neptune\*\*, a processor tailored around swimming.
+
+\- Cochlear
+
+ - BTE: \*\*Nucleus 7\*\* was FDA approved in 2017 but the Nucleus 8 has been announced outside the US and US availability is pending FDA approval, expected in late 2022 or early 2023. The \*\*Nucleus 8\*\* is expected to have broad Bluetooth protocol support including the new Auracast protocol but will still not have the capability to relay the wearer's voice back to the telephone or computer.
+
+ - OTE: \*\*Kanso 2\*\* was FDA approved in 2020 and is a single disc processor atop the magnet to avoid interfering with eyeglasses and facemasks.
+
+\- Med-El
+
+ - BTE: \*\*Sonnet 2\*\* was FDA approved in 2020 and can support Bluetooth connections with a battery attachment.
+
+ - OTE: \*\*Rondo 3\*\* was also FDA approved in 2020. The Rondo 3 does not have any direct Bluetooth capability on its own and requires a separate device from Med-El.
+
+The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these chateristics might vary for other other patients.
+
+Let's start by examining Implant Technology. In this case we will assign a value of 4 for the relative strength of Advanced Bionics' implant technology to that of Cochlear's. A 4 is between "slightly more important" and "moderately more important." After populating the vector (one-dimensional matrix) of \`matB1\`, we then place the result in \`matB1r\`.
+
+\`\`\`{r}
+
+alts \<- c("AB", "Coch", "Med") \# Device Alteratives
+
+\# Implant Technology Pairwise Comparisons
+
+matB1 \<- matrix(c(5, 4, -2), ncol=3)
+
+c("AB_Coch", "AB_Med", "Coch_Med")
+
+\# Analysis by AHP
+
+matB1r \<- ahpsurvey::ahp(matB1, atts=alts)
+
+knitr::kable (matB1r, booktabs=T,
+
+caption="Implant Technology")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+In this case we can see that the Implant Technology strongly favors Advanced Bionics followed by Med-El.
+
+\`\`\`{r}
+
+\# Flexibility
+
+matB2 \<- matrix(c(-4, -2, 1), ncol=3)
+
+c("AB_Coch", "AB_Med", "Coch_Med")
+
+matB2r \<- ahpsurvey::ahp(matB2, atts=alts)
+
+\# Connectivity: Current Connectivity options and support
+
+matB3 \<- matrix(c(4, 2, -2), ncol=3)
+
+c("AB_Coch", "AB_Med", "Coch_Med")
+
+matB3r \<- ahpsurvey::ahp(matB3, atts=alts)
+
+\# Future: Future expansion capability and company prospects
+
+matB4 \<- matrix(c(6, 2, -2), ncol=3)
+
+c("AB_Coch", "AB_Med", "Coch_Med")
+
+matB4r \<- ahpsurvey::ahp(matB4, atts=alts)
+
+\# \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\--
+
+\# Displaying results
+
+knitr::kable (matB2r, booktabs=T,
+
+caption="Flexibility of System: For Example Off the Ear Processor Option")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+knitr::kable (matB3r, booktabs=T,
+
+caption="Connectivity: Comprehensiveness and Robustness of Connection Options such as Bluetooth, Aurcast, Speaking on Phones")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+knitr::kable (matB4r, booktabs=T,
+
+caption="Future: Long-term Prospects for Improved Capabilities")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+\## Integrating Characteristic Preferences and Alternatives
+
+Now it is time to put everything together.
+
+As we saw earlier, each of the analysis results has three components, the integrated results, the consistency ratio, and the relative ranking. For numerical purposes, we will extract the scores. We'll start with the weights on the characteristics.
+
+\`\`\`{r}
+
+char_weights \<- matAr\[1:4\]
+
+knitr::kable (char_weights, booktabs=T,
+
+caption="Weights for each characteristic")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+Now, let's do the same thing for each of the device characteristics.
+
+\`\`\`{r}
+
+device_weights \<- rbind (matB1r\[1:3\], matB2r\[1:3\], matB3r\[1:3\], matB4r\[1:3\])
+
+rownames(device_weights)\<-c("Implant Technology","Flexibility",
+
+"Connectivity", "Future")
+
+knitr::kable (device_weights, booktabs=T,
+
+caption="Weights for each device on each characteristic")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+The last step is to simply multiply the device weights and characteristic weights to come up with an overall score.
+
+\`\`\`{r}
+
+final_score \<- t(device_weights) %\*% t(char_weights)
+
+knitr::kable (final_score, booktabs=T,
+
+caption="Final score for each manufacturer.")\|\>
+
+kableExtra::kable_styling(latex_options = "hold_position")
+
+\`\`\`
+
+In this case, it appears that the preferred alternative is Advanced Bionics.
+
+The patient has until December to make a final decision and will continue to revise the model and results with additional information.
+
+\## Future Work
+
+This work could be extended in several directions.
+
+\- Refining the model in terms of characteristics.
+
+\- Applying HDM in place of AHP
+
+\- Testing the impact of AHP alternatives
+
+\- Verifying the model with other patients
+
+\- Gathering responses from other patients
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
