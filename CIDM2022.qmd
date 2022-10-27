@@ -7,6 +7,8 @@ editor: visual
 
 # Cochlear Implant Decision Making
 
+## Introduction
+
 In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making from a patient's perspective using hierarchical decision making. This paper revisits this decision using analytical hierarchy process with currently available devices. The model is also simplified and the analysis is done using packages in R as a Quarto markdown document.
 
 ## Background
@@ -25,6 +27,8 @@ The earlier PICMET paper used 8 characteristics divided into three categories:
     -   Future Implant Capability
     -   Warranty and Reliability
 
+## Revised Model
+
 This paper simplifies the model to just four characteristics of a cochlear implant system.
 
 -   **Implant:** Technology for internally implanted device's current capabilities. While anecdotal comments and studies do not appear to find clear differences in success outcomes by manufacturers, the technologies are different.
@@ -41,7 +45,6 @@ Let's start by loading two packages. The first, `ahpsurvey`, is for doing Analyt
 ```{r}
 library (ahpsurvey)
 library (kableExtra)
-
 ```
 
 First we will construct the data comparing the relative attributes.
@@ -102,7 +105,6 @@ The processor devices are summarized below
 The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these chateristics might vary for other other patients.
 
 Let's start by examining Implant Technology. In this case we will assign a value of 4 for the relative strength of Advanced Bionics' implant technology to that of Cochlear's. A 4 is between "slightly more important" and "moderately more important." After populating the vector (one-dimensional matrix) of `matB1`, we then place the result in `matB1r`.
-
 
 ```{r}
 
