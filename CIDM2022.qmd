@@ -198,6 +198,76 @@ In this case, it appears that the preferred alternative is Advanced Bionics.
 
 The patient has until December to make a final decision and will continue to revise the model and results with additional information.
 
+## HDM Analysis
+
+### Loading R Script for HDM
+
+Kevin van Blommestein wrote an R script for doing HDM. Let's load this in script to make it available for the analysis. 
+
+```{r, include=FALSE}
+source("HDM.R", local = knitr::knit_global())
+# or sys.source("your-script.R", envir = knitr::knit_global())
+```
+
+
+### Conducting HDM
+
+```{r}
+#--------------------------------------------------------#
+### Tests 4: Multi-level pairwise comparisons (HDM) 
+###          - Specify as dataframe
+#--------------------------------------------------------#
+# A, B, and C are characteristics
+# A:  Convenience of Processor
+# B:  Electrode Technology
+# C:  Connectivity
+
+# D, E, F, G, H, I, J, K are alternatives.
+# We'll test this case based on too many alternatives and 
+#    the modify the example to have only three as in the
+#    cochlear implant case.
+
+d <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90))
+
+dl <- df.list(d)
+
+m <- pwc.matrix(d1, one.side = T)
+
+pc <- pwc.weights(m)
+
+```
+
+
+```{r}
+#--------------------------------------------------------#
+### Tests 4: Multi-level pairwise comparisons (HDM) 
+###          - Specify as dataframe
+#--------------------------------------------------------#
+# A, B, and C are characteristics
+# A:  Convenience of Processor
+# B:  Electrode Technology
+# C:  Connectivity
+
+# D, E, F are alternatives.
+# D:  Advanced Bionics 
+# E:  Med-El
+# F:  cochlear 
+
+d <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90),
+								A.D_E = c(90), A.D_F = c(10), A.E_F = c(10),
+								B.G_H = c(90), B.G_I = c(10), B.H_I = c(10),
+								C.J_K = c(90), C.J_L = c(10), C.K_L = c(10))
+
+dl <- df.list(d)
+
+r <- hdm(dl, one.side = TRUE)
+
+r
+
+```
+
+### Interpretation of HDM Results
+
 ## Future Work
 
 This work could be extended in several directions.
