@@ -9,7 +9,11 @@ editor: visual
 
 ## Introduction
 
-In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making from a patient's perspective using hierarchical decision making. This paper revisits this decision using analytical hierarchy process with currently available devices. The model is also simplified and the analysis is done using packages in R as a Quarto markdown document.
+In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making of a cochlear implant system from a patient's perspective using hierarchical decision making. This paper returns to this application demonstrating two different but related pair-wise comparison decision making techniquesanalytical hierarchy process, AHP, and Hierarchical Decision Modeling, HDM.
+
+Furthermore, it is updated to reflect currently available hardware and evolving user needs and compares the results to the 2016 paper.
+
+The model is also simplified and the analysis is done using packages in R as a Quarto markdown document.
 
 ## Background
 
@@ -102,7 +106,7 @@ The processor devices are summarized below
 
     -   OTE: **Rondo 3** was also FDA approved in 2020. The Rondo 3 does not have any direct Bluetooth capability on its own and requires a separate device from Med-El.
 
-The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these chateristics might vary for other other patients.
+The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these characteristics might vary for other other patients.
 
 Let's start by examining Implant Technology. In this case we will assign a value of 4 for the relative strength of Advanced Bionics' implant technology to that of Cochlear's. A 4 is between "slightly more important" and "moderately more important." After populating the vector (one-dimensional matrix) of `matB1`, we then place the result in `matB1r`.
 
@@ -111,55 +115,57 @@ Let's start by examining Implant Technology. In this case we will assign a value
 alts <- c("AB", "Coch", "Med")   # Device Alteratives
 
 # Implant Technology Pairwise Comparisons
-matB1 <- matrix(c(5, 4, -2), ncol=3)
-  c("AB_Coch", "AB_Med", "Coch_Med")
+matB1 <- matrix(c(6, 1, -4), ncol=3)
+#colnames(matB1) <- c("AB_Coch", "AB_Med", "Coch_Med")
 
 # Analysis by AHP  
 matB1r <- ahpsurvey::ahp(matB1, atts=alts)
+       
+```
+
+Recall that in this case a negative value in a pairwise comparison reflects what Saaty's AHP would use as a a reciprocal of the absolute value. For example, assume that a device A compared to device B had a -5 with respect to a characteristic. This means that B is strongly preferred on this characteristic to A. In Saaty's notation, this would be denoted as as $\frac{1}{5}$ instead of -5. The negative value is used to avoid issues of displaying significant digits.
+
+```{r echo=FALSE}
 
 knitr::kable (matB1r, booktabs=T,
               caption="Implant Technology")|> 
-  kableExtra::kable_styling(latex_options =  "hold_position")         
+  kableExtra::kable_styling(latex_options =  "hold_position")  
 ```
 
 In this case we can see that the Implant Technology strongly favors Advanced Bionics followed by Med-El.
 
 ```{r}
 # Flexibility 
-matB2 <- matrix(c(-4, -2, 1), ncol=3)
+matB2 <- matrix(c(-7, -5, 1), ncol=3)
   c("AB_Coch", "AB_Med", "Coch_Med")
 matB2r <- ahpsurvey::ahp(matB2, atts=alts)
 
 # Connectivity:  Current Connectivity options and support 
-matB3 <- matrix(c(4, 2, -2), ncol=3)
+matB3 <- matrix(c(2, 3, 2), ncol=3)
   c("AB_Coch", "AB_Med", "Coch_Med")
 matB3r <- ahpsurvey::ahp(matB3, atts=alts)
 
 # Future:  Future expansion capability and company prospects 
-matB4 <- matrix(c(6, 2, -2), ncol=3)
+matB4 <- matrix(c(6, 1, -5), ncol=3)
   c("AB_Coch", "AB_Med", "Coch_Med")
 matB4r <- ahpsurvey::ahp(matB4, atts=alts)
-
-# ---------------------
-# Displaying results
-   
-
-knitr::kable (matB2r, booktabs=T,
-caption="Flexibility of System: For Example Off the Ear Processor Option")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")            
-
-knitr::kable (matB3r, booktabs=T,
-caption="Connectivity:  Comprehensiveness and Robustness of Connection Options such as Bluetooth, Aurcast, Speaking on Phones")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")            
-
-knitr::kable (matB4r, booktabs=T,
-caption="Future: Long-term Prospects for Improved Capabilities")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")            
 ```
 
 ## Integrating Characteristic Preferences and Alternatives
 
 Now it is time to put everything together.
+
+Recall the collective judgments for how Cochlear Implant Systems compare on each characteristic.
+
+```{r}
+judgments <- rbind (matB1, matB2, matB3, matB4)
+rownames (judgments)<-c("Implant Technology", "Flexibility", 
+                        "Connectivity", "Future")
+colnames (judgments)<-   c("AB_Coch", "AB_Med", "Coch_Med")
+knitr::kable (judgments, booktabs=T,
+              caption="Relative judgements of systems on each characteristic")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")  
+```
 
 As we saw earlier, each of the analysis results has three components, the integrated results, the consistency ratio, and the relative ranking. For numerical purposes, we will extract the scores. We'll start with the weights on the characteristics.
 
@@ -171,9 +177,26 @@ caption="Weights for each characteristic")|>
 kableExtra::kable_styling(latex_options =  "hold_position")  
 ```
 
+```{r echo=FALSE}
+# ---------------------
+# Displaying results
+   
+knitr::kable (matB2r, booktabs=T,
+caption="Flexibility of System: For Example Off the Ear Processor Option")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")            
+
+knitr::kable (matB3r, booktabs=T,
+caption="Connectivity:  Comprehensiveness and Robustness of Connection Options such as Bluetooth, Aurcast, Speaking on Phones")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")            
+
+knitr::kable (matB4r, booktabs=T,
+caption="Future: Long-term Prospects for Improved Capabilities")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")           
+```
+
 Now, let's do the same thing for each of the device characteristics.
 
-```{r}
+```{r echo=FALSE}
 device_weights <- rbind (matB1r[1:3], matB2r[1:3], matB3r[1:3], matB4r[1:3])
 
 rownames(device_weights)<-c("Implant Technology","Flexibility",
@@ -189,9 +212,12 @@ The last step is to simply multiply the device weights and characteristic weight
 ```{r}
 final_score <- t(device_weights) %*% t(char_weights)
 
+```
+
+```{r echo=FALSE}
 knitr::kable (final_score, booktabs=T,
 caption="Final score for each manufacturer.")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")  
+kableExtra::kable_styling(latex_options =  "hold_position") 
 ```
 
 In this case, it appears that the preferred alternative is Advanced Bionics.
@@ -200,15 +226,16 @@ The patient has until December to make a final decision and will continue to rev
 
 ## HDM Analysis
 
+Hierarchical Decision Modeling, HDM, similar to AHP but has been widely employed in the Engineering and Technology Management Department.
+
 ### Loading R Script for HDM
 
-Kevin van Blommestein wrote an R script for doing HDM. Let's load this in script to make it available for the analysis. 
+Kevin van Blommestein wrote an R script for doing HDM. Let's load this in script to make it available for the analysis.
 
 ```{r, include=FALSE}
 source("HDM.R", local = knitr::knit_global())
 # or sys.source("your-script.R", envir = knitr::knit_global())
 ```
-
 
 ### Conducting HDM
 
@@ -227,42 +254,15 @@ source("HDM.R", local = knitr::knit_global())
 #    the modify the example to have only three as in the
 #    cochlear implant case.
 
-d <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90))
-
-dl <- df.list(d)
+d1 <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90))
+# Name rows with unique expert names
+row.names(d1) <- c("User")
 
 m <- pwc.matrix(d1, one.side = T)
 
 pc <- pwc.weights(m)
 
-```
-
-
-```{r}
-#--------------------------------------------------------#
-### Tests 4: Multi-level pairwise comparisons (HDM) 
-###          - Specify as dataframe
-#--------------------------------------------------------#
-# A, B, and C are characteristics
-# A:  Convenience of Processor
-# B:  Electrode Technology
-# C:  Connectivity
-
-# D, E, F are alternatives.
-# D:  Advanced Bionics 
-# E:  Med-El
-# F:  cochlear 
-
-d <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90),
-								A.D_E = c(90), A.D_F = c(10), A.E_F = c(10),
-								B.G_H = c(90), B.G_I = c(10), B.H_I = c(10),
-								C.J_K = c(90), C.J_L = c(10), C.K_L = c(10))
-
-dl <- df.list(d)
-
-r <- hdm(dl, one.side = TRUE)
-
-r
+# Name rows with unique expert names
 
 ```
 
