@@ -1,0 +1,329 @@
+---
+title: "Revisiting Selecting Medical Hardware Using Pairwise Comparisons"
+author: "Tim Anderson"
+format: pdf
+editor: visual
+---
+
+# Cochlear Implant Decision Making
+
+This paper represents a set of notes on various aspects of cochlear implant decision making. As such, it shows a variety of methods and models. This is made into a more targeted paper in CIDM2023.
+
+## Introduction
+
+In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making of a cochlear implant system from a patient's perspective using hierarchical decision making. This paper returns to this application demonstrating two different but related pair-wise comparison decision making techniques analytical hierarchy process, AHP, and Hierarchical Decision Modeling, HDM.
+
+Furthermore, it is updated to reflect currently available hardware and evolving user needs and compares the results to the 2016 paper.
+
+The model is also simplified and the analysis is done using packages in R as a Quarto markdown document.
+
+## Background
+
+The earlier PICMET paper used 8 characteristics divided into three categories:
+
+-   Performance
+    -   Current Implant Technology
+    -   Main External Processor Unit
+    -   Main External Unit's Ingress Protection (IP Rating)
+-   Accessories
+    -   Secondary External Process Unit
+    -   Connection Options
+    -   Bonuses
+-   Future Issues
+    -   Future Implant Capability
+    -   Warranty and Reliability
+
+## Revised Model
+
+This paper simplifies the model to just four characteristics of a cochlear implant system.
+
+-   **Implant:** Technology for internally implanted device's current capabilities. While anecdotal comments and studies do not appear to find clear differences in success outcomes by manufacturers, the technologies are different.
+-   **Flexibility:** Variety of benefits for the device, including flexibility such as off-the-ear versus on--the-ear for an alternative external processor. It is important to use the device and throughout the day to help the brain adapt to the new way of hearing. For users with eyeglasses and mask wearing, an off the ear processor option can be a very useful option.
+-   **Connectivity:** This reflects the general connectivity capabilities of the current processor(s) such as direct Bluetooth versus requiring additional devices, and Auracast (a newly announced multipoint Bluetooth capability).
+-   **Community:** This factor is meant to capture both the community and company characteristics Each of the three companies have different philosophies and practices with respect to user communities, breadth of coverage across the hearing assistance industry, market share and more. This factor reflects how the community and company relate to the decision making process for the particular decision maker.\
+-   **Clinic:** While the surgeon will rule out alternatives that are not anatomically compatible with the patient as well as ones that they just don't support, there is a benefit to also using the company that the clinic, surgeon, and audiologists have the greatest familiarity with given the complexity of the technology.
+
+Some other factors to consider might include comfort for wearing, battery life, frequency of recalls, commitment to support out of warranty products, support community, familiarity of clinic/surgeon with the manufacturer.
+
+## Analysis
+
+```{r}
+library (kableExtra)
+```
+
+Just as there was in 2016, there are three United States FDA approved cochlear implant manufacturers: Advanced Bionics, Cochlear, and Med-El. The result is that for US patients, it typically is a choice between just these three manufacturers although sometimes one or two manufactures are not options due to patient's unique clinical characteristics, insurance coverage, or clinic limitations.
+
+The patient's decision is then two-fold, first whether to get a cochlear implant and secondly which manufacturer to select. A third decision could be which device to select since each manufacturer offers a standard behind-the-ear (BTE) device processor and then a secondary off-the-ear (OTE) processor option.
+
+The processor devices are summarized below
+
+-   Advanced Bionics
+
+    -   BTE: **Naida M90** was approved by the FDA in 2020 and is the only cochlear implant that allows the wearer to speak on a phone call using Bluetooth. No other cochlear implant in 2022 has the capability of an inexpensive Bluetooth earpiece.
+
+    -   OTE: **Neptune**, a processor tailored around swimming but which has been discontinued leaving Advanced Bionics with only one device for adults.
+
+-   Cochlear
+
+    -   BTE: **Nucleus 8** was FDA approved in November 2022. It is expected to have broad Bluetooth protocol support including the new Auracast protocol with a planned firmware upgrade but will still not have the capability to relay the wearer's voice back to the telephone or computer.
+
+    -   OTE: **Kanso 2** was FDA approved in 2020 and is a single disc processor atop the magnet to avoid interfering with eyeglasses and facemasks.
+
+-   Med-El
+
+    -   BTE: **Sonnet 2** was FDA approved in 2020 and can support Bluetooth connections with a battery attachment.
+
+    -   OTE: **Rondo 3** was also FDA approved in 2020. The Rondo 3 does not have any direct Bluetooth capability on its own and requires a separate device from Med-El.
+
+Much more could be said about each of the devices. Each of the devices is approved by US Food and Drug Administration.
+
+Note that Cochlear has about 50% market share while Med-El and Advanced Bionics are approximately evenly divided for the remaining market share.\
+The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these characteristics might vary for other other patients.
+
+Let's start by examining Implant Technology. In this case we will assign a value of 4 for the relative strength of Advanced Bionics' implant technology to that of Cochlear's. A 4 is between "slightly more important" and "moderately more important." After populating the vector (one-dimensional matrix) of `matB1`, we then place the result in `matB1r`.
+
+## HDM Analysis
+
+Hierarchical Decision Modeling, HDM, similar to AHP but has been widely employed in the Engineering and Technology Management Department.
+
+The following diagram illustrates the decision structure.
+
+```{r, include=FALSE, fig.cap = "Cochlear Implant Device Selection"}
+library(DiagrammeR)
+library (webshot2)
+mermaid("
+graph TD
+  A(Cochlear Implant Device Selection)-->B(Implant)
+  A-->C(Flexibility)
+  A-->D(Connectivity)
+  A-->E(Community)
+  A-->F(Clinic)
+  B-->J(Advanced Bionics)
+  B-->K(Cochlear LLC)
+  B-->M(MedEl)
+  C-->J
+  C-->K
+  C-->M
+  D-->J
+  D-->K
+  D-->M
+  E-->J
+  E-->K
+  E-->M
+  F-->J
+  F-->K
+  F-->M
+")
+```
+
+### Loading R Script for HDM
+
+Kevin van Blommestein wrote an R script for doing HDM. Let's load this script to make it available for the analysis.
+
+```{r, include=FALSE}
+source("HDM.R", local = knitr::knit_global())
+# or sys.source("your-script.R", envir = knitr::knit_global())
+```
+
+### Evaluating Characteristics
+
+Kevin van Blommestein's R functions for doing DEA requires that the pair-wise comparison information is entered as a dataframe. The pair-wise comparison information is key to the analysis. To keep things straight, it is helpful to denote each of the 5 characteristics with a letter, which in our case with five characteristics means that we have A, B, C, D, and E. With 5 characteristics and doing a comparison, we will have *4+3+2+1=10* comparisons.
+
+We have the `A_B=c(45)` has a lot of meaning that needs to be understood. First, it is representing a pair-wise comparison of A versus B. In our case, this is Implant vs. Flexibility and the number represents the points given the second item (B) on a 100 point scale. Therefore, the first item gets 100 minus that that. In the case of the Implant, `A_B=c(45)` means that *B* (or Flexibility) is given 45 points and *A* (or Implant) is given 55 points. This should be interpreted as A (Implant) being slightly more important than B (Flexibility).
+
+We repeat this process for all ten pair-wise comparisons.
+
+```{r}
+# A, B, C, D, and E are characteristics
+# A:  Implant
+# B:  Flexibility
+# C:  Connectivity
+# D:  Company
+# E:  Clinic
+
+# A_B=45 indicates that A is given 55 and B is given 35 points.
+#     In other words, A is much more important than B.
+
+d2_0 <- data.frame(A_B=c(45), A_C=c(30), A_D=c(30), A_E=c(40),
+                              B_C=c(40), B_D=c(40), B_E=c(50),
+                                         C_D=c(50), C_E=c(60),
+                                                    D_E=c(60))
+# Name rows with unique names
+row.names(d2_0) <- c("Characteristic")
+```
+
+```{r, echo=FALSE}
+kbl(d2_0, 
+    booktabs=T, escape=T, 
+    caption="Pair-wise Comparisons of Characteristics",
+    col.names=c("A\\_B", "A\\_C", "A\\_D", "A\\_E", 
+                         "B\\_C", "B\\_D", "B\\_E", 
+                                  "C\\_D", "C\\_E",
+                                           "D\\_E"))|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
+```
+
+If we had four experts and were trying to synthesize their perspectives, instead of `A_B=c(45)` we might have `A_B=c(45, 25, 30, 50)` where the second expert had a much stronger priority for characteristic A and the fourth expert had an equal priority for A and B.
+
+The pair-wise comparisons are then converted into a matrix.
+
+```{r}
+m2_0 <- pwc.matrix(d2_0, one.side = T)
+```
+
+```{r, echo=FALSE}
+kbl(m2_0, 
+    booktabs=T, 
+    caption="Pair-wise Comparison Matrix")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
+```
+
+Note that the pair-wise comparision values we had earlier are just from the upper triangular portion of the matrix and the complement to these values are in the lower triangular part of the graph. This matrix is what is needed for analysis.
+
+We are now ready to call the function for doing the heirarchical decision modeling analysis.
+
+```{r}
+pc2_0 <- pwc.weights(m2_0)
+
+
+
+
+```
+
+```{r, echo=FALSE}
+kbl(pc2_0$detail$weights, 
+    booktabs=T, 
+    caption="Relative Priorities of Characteristics")|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
+```
+
+In this case we can see that characteristic A (Implant) is the highest priority for the decision maker.
+
+### Comparing Alternatives for Each Characteristic
+
+Now let's examine each of the options with respect to the characteristics.
+
+```{r}
+# A, B, and C are alternatives
+# A:  Advanced Bionics
+# B:  Cochlear
+# C:  Med-El
+
+# A_B=20 indicates that A (Adv. Bionics) gets 80 points, Cochlear gets 20
+#    on this characteristic.
+
+d2_1 <- data.frame(A_B=c(20), A_C=c(53),    # Implant
+                              B_C=c(82))
+row.names(d2_1) <- c("Implant")
+
+m2_1 <- pwc.matrix(d2_1, one.side = T)
+pc2_1 <- pwc.weights(m2_1)
+
+pc2_1$detail$weights
+```
+
+```{r}
+d2_2 <- data.frame(A_B=c(90), A_C=c(90),    # Flexibility
+                              B_C=c(50))
+row.names(d2_2) <- c("Flexibility")
+
+m2_2 <- pwc.matrix(d2_2, one.side = T)
+pc2_2 <- pwc.weights(m2_2)
+
+pc2_2$detail$weights
+```
+
+```{r}
+d2_3 <- data.frame(A_B=c(45), A_C=c(10),    # Connectivity
+                              B_C=c(12))
+row.names(d2_3) <- c("Connectivity")
+
+m2_3 <- pwc.matrix(d2_3, one.side = T)
+pc2_3 <- pwc.weights(m2_3)
+
+pc2_3$detail$weights
+```
+
+```{r}
+d2_4 <- data.frame(A_B=c(60), A_C=c(65),    # Community
+                              B_C=c(53))
+row.names(d2_4) <- c("Community")
+
+m2_4 <- pwc.matrix(d2_4, one.side = T)
+pc2_4 <- pwc.weights(m2_4)
+
+pc2_4$detail$weights
+```
+
+```{r}
+d2_5 <- data.frame(A_B=c(30), A_C=c(50),    # Clinic
+                              B_C=c(70))
+row.names(d2_5) <- c("Clinic")
+
+m2_5 <- pwc.matrix(d2_5, one.side = T)
+pc2_5 <- pwc.weights(m2_5)
+
+pc2_5$detail$weights
+```
+
+```{r}
+alts2 <- rbind(pc2_1$detail$weights,
+              pc2_2$detail$weights,
+              pc2_3$detail$weights,
+              pc2_4$detail$weights,
+              pc2_5$detail$weights)
+
+res2 <- t(alts2)%*%t(pc2_0$detail$weights)
+
+incon2 <- rbind(pc2_1$summary$inconsistency, 
+               pc2_2$summary$inconsistency, 
+               pc2_3$summary$inconsistency, 
+               pc2_4$summary$inconsistency, 
+               pc2_5$summary$inconsistency) 
+```
+
+Let's summarize the results in a few tables.
+
+```{r}
+kbl(cbind(alts2, incon2, t(pc2_0$detail$weights)), 
+    booktabs=T, digits=5,
+    caption="Weights by Alternative",
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)", 
+                  "Inconsistency",
+                  "Importance"))|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
+```
+
+These results show a number of interesting things:
+
+We can see that Med-El generally well on each characteristic other than connectivity.
+
+-   Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
+-   The importance of the characteristics varies. The implant technology is permanent whereas the external processors can change over time with regular upgrades. Not surprisingly, the implant then gets the highest weight.
+
+Now what we need to do is to combine the results by multiplying the performance on each characteristic by the importance.
+
+```{r}
+res2 <- t(alts2)%*%t(pc2_0$detail$weights)
+kbl(t(res2), 
+    booktabs=T, digits=5,
+    caption="Overall Score for Five Characteristic HDM Model",
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
+```
+
+This analysis indicates that for this particular decision maker, the preferred alternative is **C** or to adopt the Med-El cochlear implant. Other decision makers will have different priorities for each characteristic, may develop a different decomposition in terms of characteristics, and assess the relative strengths of each alternative with respect to the characteristics differently.
+
+## Future Work
+
+This work could be extended in several directions.
+
+-   Refining the model in terms of characteristics.
+
+-   Applying HDM in place of AHP
+
+-   Testing the impact of AHP alternatives
+
+-   Verifying the model with other patients
+
+-   Gathering responses from other patients

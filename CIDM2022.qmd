@@ -7,9 +7,11 @@ editor: visual
 
 # Cochlear Implant Decision Making
 
+This paper represents a set of notes on various aspects of cochlear implant decision making. As such, it shows a variety of methods and models.  This is made into a more targeted paper in CIDM2023.
+
 ## Introduction
 
-In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making of a cochlear implant system from a patient's perspective using hierarchical decision making. This paper returns to this application demonstrating two different but related pair-wise comparison decision making techniquesanalytical hierarchy process, AHP, and Hierarchical Decision Modeling, HDM.
+In 2016, [Anderson and Jahromi](https://pdxscholar.library.pdx.edu/etm_fac/93/) demonstrated medical device decision making of a cochlear implant system from a patient's perspective using hierarchical decision making. This paper returns to this application demonstrating two different but related pair-wise comparison decision making techniques analytical hierarchy process, AHP, and Hierarchical Decision Modeling, HDM.
 
 Furthermore, it is updated to reflect currently available hardware and evolving user needs and compares the results to the 2016 paper.
 
@@ -239,12 +241,12 @@ source("HDM.R", local = knitr::knit_global())
 # or sys.source("your-script.R", envir = knitr::knit_global())
 ```
 
-```{r, echo=FALSE, fig.cap = "Cochlear Implant Device Selection"}
+```{r, include=FALSE, fig.cap = "Cochlear Implant Device Selection"}
 library(DiagrammeR)
 library (webshot2)
 mermaid("
 graph TD
-  A(Cochlear Implant Company Selection)-->B(Implant)
+  A(Cochlear Implant Device Selection)-->B(Implant)
   A-->C(Connectivity)
   A-->D(Future)
   B-->J(Advanced Bionics)
@@ -284,11 +286,12 @@ Repeat for each
 
 Five Factor HDM Model
 
-```{r}
+```{r, include=FALSE, fig.cap = "Cochlear Implant Device Selection"}
 library(DiagrammeR)
+library (webshot2)
 mermaid("
 graph TD
-  A(Cochlear Implant Company Selection)-->B(Implant)
+  A(Cochlear Implant Device Selection)-->B(Implant)
   A-->C(Flexibility)
   A-->D(Connectivity)
   A-->E(Community)
@@ -429,7 +432,8 @@ kbl(cbind(alts2, incon2, t(pc2_0$detail$weights)),
     caption="Weights by Alternative",
     col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)", 
                   "Inconsistency",
-                  "Importance"))
+                  "Importance"))|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
 ```
 
 These results show a number of interesting things:
@@ -448,9 +452,11 @@ res2 <- t(alts2)%*%t(pc2_0$detail$weights)
 kbl(t(res2), 
     booktabs=T, digits=5,
     caption="Overall Score for Five Characteristic HDM Model",
-    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))|> 
+kableExtra::kable_styling(latex_options =  "hold_position")
 ```
 
+This analysis indicates that for this particular decision maker, the preferred alternative is **C** or to adopt the Med-El cochlear implant. Other decision makers will have different priorities for each characteristic, may develop a different decomposition in terms of characteristics, and assess the relative strengths of each alternative with respect to the characteristics differently.  
 
 ## Future Work
 
