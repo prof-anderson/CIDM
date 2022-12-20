@@ -58,9 +58,9 @@ atts <- c("impl", "flex", "conn", "fut")
 
 matA <- matrix(c(-2,-2,-2,1,2,2), ncol=6)
 
-colnames (matA) <- c("imp_flex", "imp_conn", 
-                        "impl_fut", "flex_conn",
-                        "flex_fut", "conn_fut")
+colnames (matA) <- c("imp_flex", "imp_conn", "impl_fut", 
+                     "flex_conn", "flex_fut", 
+                     "conn_fut")
 
 kbl(matA , booktabs=T, 
     caption="Patient's preferences of characteristics.") |> 
@@ -186,7 +186,7 @@ caption="Flexibility of System: For Example Off the Ear Processor Option")|>
 kableExtra::kable_styling(latex_options =  "hold_position")            
 
 knitr::kable (matB3r, booktabs=T,
-caption="Connectivity:  Comprehensiveness and Robustness of Connection Options such as Bluetooth, Aurcast, Speaking on Phones")|> 
+caption="Connectivity:  Comprehensiveness and Robustness of Connection Options such as Bluetooth, Auracast, Speaking on Phone Calls")|> 
 kableExtra::kable_styling(latex_options =  "hold_position")            
 
 knitr::kable (matB4r, booktabs=T,
@@ -232,27 +232,40 @@ Hierarchical Decision Modeling, HDM, similar to AHP but has been widely employed
 
 Kevin van Blommestein wrote an R script for doing HDM. Let's load this in script to make it available for the analysis.
 
+## Three Factor Model
+
 ```{r, include=FALSE}
 source("HDM.R", local = knitr::knit_global())
 # or sys.source("your-script.R", envir = knitr::knit_global())
 ```
 
+```{r, echo=FALSE, fig.cap = "Cochlear Implant Device Selection"}
+library(DiagrammeR)
+library (webshot2)
+mermaid("
+graph TD
+  A(Cochlear Implant Company Selection)-->B(Implant)
+  A-->C(Connectivity)
+  A-->D(Future)
+  B-->J(Advanced Bionics)
+  B-->K(Cochlear LLC)
+  B-->M(MedEl)
+  C-->J
+  C-->K
+  C-->M
+  D-->J
+  D-->K
+  D-->M
+", height = '100%', width = '100%')
+```
+
 ### Conducting HDM
 
 ```{r}
-#--------------------------------------------------------#
-### Tests 4: Multi-level pairwise comparisons (HDM) 
-###          - Specify as dataframe
-#--------------------------------------------------------#
 # A, B, and C are characteristics
 # A:  Convenience of Processor
 # B:  Electrode Technology
 # C:  Connectivity
-
-# D, E, F, G, H, I, J, K are alternatives.
-# We'll test this case based on too many alternatives and 
-#    the modify the example to have only three as in the
-#    cochlear implant case.
 
 d1 <- data.frame(A_B = c(90), A_C = c(90), B_C = c(90))
 # Name rows with unique expert names
@@ -262,11 +275,182 @@ m <- pwc.matrix(d1, one.side = T)
 
 pc <- pwc.weights(m)
 
-# Name rows with unique expert names
-
+pc$detail$weights
 ```
 
 ### Interpretation of HDM Results
+
+Repeat for each
+
+Five Factor HDM Model
+
+```{r}
+library(DiagrammeR)
+mermaid("
+graph TD
+  A(Cochlear Implant Company Selection)-->B(Implant)
+  A-->C(Flexibility)
+  A-->D(Connectivity)
+  A-->E(Community)
+  A-->F(Clinic)
+  B-->J(Advanced Bionics)
+  B-->K(Cochlear LLC)
+  B-->M(MedEl)
+  C-->J
+  C-->K
+  C-->M
+  D-->J
+  D-->K
+  D-->M
+  E-->J
+  E-->K
+  E-->M
+  F-->J
+  F-->K
+  F-->M
+")
+```
+
+```{r}
+# A, B, C, D, and E are characteristics
+# A:  Implant
+# B:  Flexibility
+# C:  Connectivity
+# D:  Company
+# E:  Clinic
+
+# A_B=35 indicates that A is given 65 and B is given 35 points.
+#     In other words, A is much more important than B.
+
+d2_0 <- data.frame(A_B=c(45), A_C=c(30), A_D=c(30), A_E=c(40),
+                              B_C=c(40), B_D=c(40), B_E=c(50),
+                                         C_D=c(50), C_E=c(60),
+                                                    D_E=c(60))
+# Name rows with unique expert names
+row.names(d2_0) <- c("Characteristic")
+
+m2_0 <- pwc.matrix(d2_0, one.side = T)
+
+pc2_0 <- pwc.weights(m2_0)
+
+pc2_0$detail$weights
+```
+
+Now let's examine each of the options with respect the features.
+
+```{r}
+# A, B, and C are alernatives
+# A:  Advanced Bionics
+# B:  Cochlear
+# C:  Med-El
+
+# A_B=20 indicates that A (Adv. Bionics) gets 80 points, Cochlear gets 20
+#    on this characteristic.
+
+d2_1 <- data.frame(A_B=c(20), A_C=c(53),    # Implant
+                              B_C=c(82))
+row.names(d2_1) <- c("Implant")
+
+m2_1 <- pwc.matrix(d2_1, one.side = T)
+pc2_1 <- pwc.weights(m2_1)
+
+pc2_1$detail$weights
+```
+
+```{r}
+d2_2 <- data.frame(A_B=c(90), A_C=c(90),    # Flexibility
+                              B_C=c(50))
+row.names(d2_2) <- c("Flexibility")
+
+m2_2 <- pwc.matrix(d2_2, one.side = T)
+pc2_2 <- pwc.weights(m2_2)
+
+pc2_2$detail$weights
+```
+
+
+```{r}
+d2_3 <- data.frame(A_B=c(45), A_C=c(10),    # Connectivity
+                              B_C=c(12))
+row.names(d2_3) <- c("Connectivity")
+
+m2_3 <- pwc.matrix(d2_3, one.side = T)
+pc2_3 <- pwc.weights(m2_3)
+
+pc2_3$detail$weights
+```
+
+```{r}
+d2_4 <- data.frame(A_B=c(60), A_C=c(65),    # Community
+                              B_C=c(53))
+row.names(d2_4) <- c("Community")
+
+m2_4 <- pwc.matrix(d2_4, one.side = T)
+pc2_4 <- pwc.weights(m2_4)
+
+pc2_4$detail$weights
+```
+
+
+
+```{r}
+d2_5 <- data.frame(A_B=c(30), A_C=c(50),    # Clinic
+                              B_C=c(70))
+row.names(d2_5) <- c("Clinic")
+
+m2_5 <- pwc.matrix(d2_5, one.side = T)
+pc2_5 <- pwc.weights(m2_5)
+
+pc2_5$detail$weights
+```
+
+```{r}
+alts2 <- rbind(pc2_1$detail$weights,
+              pc2_2$detail$weights,
+              pc2_3$detail$weights,
+              pc2_4$detail$weights,
+              pc2_5$detail$weights)
+
+res2 <- t(alts2)%*%t(pc2_0$detail$weights)
+
+incon2 <- rbind(pc2_1$summary$inconsistency, 
+               pc2_2$summary$inconsistency, 
+               pc2_3$summary$inconsistency, 
+               pc2_4$summary$inconsistency, 
+               pc2_5$summary$inconsistency) 
+```
+
+
+Let's summarize the results in a few tables.
+
+```{r}
+kbl(cbind(alts2, incon2, t(pc2_0$detail$weights)), 
+    booktabs=T, digits=5,
+    caption="Weights by Alternative",
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)", 
+                  "Inconsistency",
+                  "Importance"))
+```
+
+These results show a number of interesting things:
+
+We can see that Med-El generally well on each characteristic other than connectivity.
+
+- Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
+- The importance of the characteristics varies.  The implant technology is permanent whereas the external processors can change over time with regular upgrades.  Not surprisingly, the implant then gets the highest weight.
+
+
+Now what we need to do is to combine the results by multiplying the performance on each characteristic by the importance.
+
+
+```{r}
+res2 <- t(alts2)%*%t(pc2_0$detail$weights)
+kbl(t(res2), 
+    booktabs=T, digits=5,
+    caption="Overall Score for Five Characteristic HDM Model",
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))
+```
+
 
 ## Future Work
 
