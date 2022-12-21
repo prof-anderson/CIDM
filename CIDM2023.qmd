@@ -1,11 +1,15 @@
 ---
 title: "Revisiting Selecting Medical Hardware Using Pairwise Comparisons"
 author: "Tim Anderson"
-format: pdf
+format:
+  pdf:
+    fig-width: 7
+    fig-height: 5
 editor: visual
 ---
 
-```{r, include=FALSE}
+```{r}
+#| include: false
 library(kableExtra)
 ```
 
@@ -78,7 +82,8 @@ The processor devices are summarized below
 
 Much more could be said about each of the devices. Each of the devices is approved by US Food and Drug Administration.
 
-Note that Cochlear has about 50% market share while Med-El and Advanced Bionics are approximately evenly divided for the remaining market share.\
+Note that Cochlear has about 50% market share while Med-El and Advanced Bionics are approximately evenly divided for the remaining market share.
+
 The following section represents the user's perceived strengths of the three manufacturers with respect to each of the four characteristics. Note that these are all based on a patient's current perspective based on a wide-ranging exploration but do not represent medical professional's judgement. Furthermore, these perceived benefits are based on the patient's anticipated usage. Just as the patient's preferences for the four characteristics should not be interpreted as generalizing to other patients, the relative strengths of cochlear implant manufacturers on each of these characteristics might vary for other other patients.
 
 ## HDM Analysis
@@ -87,7 +92,11 @@ Hierarchical Decision Modeling, HDM, similar to AHP but has been widely employed
 
 The following diagram illustrates the decision structure.
 
-```{r, eval=TRUE, include=FALSE, fig.cap = "Cochlear Implant Device Selection"}
+```{r}
+#| eval: false
+#| include: false
+#| fig.cap:  "Cochlear Implant Device Selection"
+
 library(DiagrammeR)
 library (webshot2)
 mermaid("
@@ -119,9 +128,10 @@ graph TD
 
 Kevin van Blommestein wrote an R script for doing HDM. Let's load this script to make it available for the analysis.
 
-```{r, include=FALSE}
+```{r}
+#| include=FALSE
 source("HDM.R", local = knitr::knit_global())
-# or sys.source("your-script.R", envir = knitr::knit_global())
+ # or sys.source("your-script.R", envir = knitr::knit_global())
 ```
 
 ### Evaluating Characteristics
@@ -133,22 +143,23 @@ We have the `A_B=c(45)` has a lot of meaning that needs to be understood. First,
 We repeat this process for all ten pair-wise comparisons.  We'll display the dataframe as code output since it isn't really meant to be user-friendly.
 
 ```{r}
-# A, B, C, D, and E are characteristics
-# A:  Implant
-# B:  Flexibility
-# C:  Connectivity
-# D:  Company
-# E:  Clinic
 
-# A_B=45 indicates that A is given 55 and B is given 35 points.
-#     In other words, A is much more important than B.
+ # A, B, C, D, and E are characteristics
+ # A:  Implant
+ # B:  Flexibility
+ # C:  Connectivity
+ # D:  Company
+ # E:  Clinic
+
+ # A_B=45 indicates that A is given 55 and B is given 35 points.
+ #     In other words, A is much more important than B.
 
 d2_0 <- data.frame(A_B=c(45), A_C=c(30), A_D=c(30), A_E=c(40),
                               B_C=c(40), B_D=c(40), B_E=c(50),
                                          C_D=c(50), C_E=c(60),
                                                     D_E=c(60))
 # Name rows with unique names
-row.names(d2_0) <- c("Characteristic")
+# row.names(d2_0) <- c("Characteristic")
 #d2_0
 ```
 
@@ -160,14 +171,16 @@ The pair-wise comparisons are then converted into a matrix.
 m2_0 <- pwc.matrix(d2_0, one.side = T)
 ```
 
-```{r, echo=FALSE}
-kbl(m2_0, 
+```{r}
+#| echo: false
+
+kbl(m2_0$`1`, 
     booktabs=T, 
-    caption="Pair-wise Comparison Matrix")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")
+    caption="Pair-wise Comparison Matrix")|>  
+  kableExtra::kable_styling(latex_options =  "hold_position")
 ```
 
-Note that the pair-wise comparision values we had earlier are just from the upper triangular portion of the matrix and the complement to these values are in the lower triangular part of the graph. This matrix is what is needed for analysis.
+Note that the pair-wise comparison values we had earlier are just from the upper triangular portion of the matrix and the complement to these values are in the lower triangular part of the graph. This matrix is what is needed for analysis.
 
 We are now ready to call the function for doing the hierarchical decision modeling analysis.
 
@@ -175,11 +188,12 @@ We are now ready to call the function for doing the hierarchical decision modeli
 pc2_0 <- pwc.weights(m2_0)
 ```
 
-```{r, echo=FALSE}
+```{r}
+#| echo: false
+
 kbl(pc2_0$detail$weights, 
     booktabs=T, 
-    caption="Relative Priorities of Characteristics")|> 
-kableExtra::kable_styling(latex_options =  "hold_position")
+    caption="Relative Priorities of Characteristics") |>  kableExtra::kable_styling(latex_options =  "hold_position")
 ```
 
 In this case we can see that characteristic A (Implant) is the highest priority for the decision maker.
@@ -189,15 +203,16 @@ In this case we can see that characteristic A (Implant) is the highest priority 
 Now let's examine each of the options with respect to the characteristics.
 
 ```{r}
-# A, B, and C are alternatives
-# A:  Advanced Bionics
-# B:  Cochlear
-# C:  Med-El
 
-# A_B=20 indicates that A (Adv. Bionics) gets 80 points, Cochlear gets 20
-#    on this characteristic.
+ # A, B, and C are alternatives
+ # A:  Advanced Bionics
+ # B:  Cochlear
+ # C:  Med-El
 
-d2_1 <- data.frame(A_B=c(20), A_C=c(53),    # Implant
+ # A_B=20 indicates that A (Adv. Bionics) gets 80 points, Cochlear gets 20
+ #    on this characteristic.
+
+d2_1 <- data.frame(A_B=c(20), A_C=c(53),  # Implant
                               B_C=c(82))
 row.names(d2_1) <- c("Implant")
 
@@ -207,8 +222,10 @@ pc2_1 <- pwc.weights(m2_1)
 pc2_1$detail$weights
 ```
 
+This indicate that in terms of implant technology, C is best, followed closely by A and B is a distant third.
+
 ```{r}
-d2_2 <- data.frame(A_B=c(90), A_C=c(90),    # Flexibility
+d2_2 <- data.frame(A_B=c(90), A_C=c(90),  # Flexibility
                               B_C=c(50))
 row.names(d2_2) <- c("Flexibility")
 
@@ -218,8 +235,11 @@ pc2_2 <- pwc.weights(m2_2)
 pc2_2$detail$weights
 ```
 
+In this feature, the off the ear options for B and C are equally and very strongly preferred over the lack of an off the ear option for A.
+
 ```{r}
-d2_3 <- data.frame(A_B=c(45), A_C=c(10),    # Connectivity
+
+d2_3 <- data.frame(A_B=c(45), A_C=c(10),  # Connectivity
                               B_C=c(12))
 row.names(d2_3) <- c("Connectivity")
 
@@ -229,8 +249,11 @@ pc2_3 <- pwc.weights(m2_3)
 pc2_3$detail$weights
 ```
 
+In this factor, the full Bluetooth implementation of A allowing for handsfree phone calling is recognized, followed closely by the benefit of the B's new Nucleus 8 with Bluetooth LE protocol.
+
+
 ```{r}
-d2_4 <- data.frame(A_B=c(60), A_C=c(65),    # Community
+d2_4 <- data.frame(A_B=c(60), A_C=c(65),  # Community
                               B_C=c(53))
 row.names(d2_4) <- c("Community")
 
@@ -240,9 +263,11 @@ pc2_4 <- pwc.weights(m2_4)
 pc2_4$detail$weights
 ```
 
+This category recognizes the community benefit of C along with the strong marketshare for B.
+
 ```{r}
-d2_5 <- data.frame(A_B=c(30), A_C=c(50),    # Clinic
-                              B_C=c(70))
+d2_5 <- data.frame(A_B=c(45), A_C=c(50),  # Clinic
+                              B_C=c(55))
 row.names(d2_5) <- c("Clinic")
 
 m2_5 <- pwc.matrix(d2_5, one.side = T)
@@ -251,40 +276,40 @@ pc2_5 <- pwc.weights(m2_5)
 pc2_5$detail$weights
 ```
 
+The recipient's clinic only recently restarted doing B and therefore A and C are recognized as having greater familiarity and support at the clinic. Given B's 50% market share in the worldwide cochlear implant market, this will likely be different for other patients.
+
 ```{r}
 alts2 <- rbind(pc2_1$detail$weights,
-              pc2_2$detail$weights,
-              pc2_3$detail$weights,
-              pc2_4$detail$weights,
-              pc2_5$detail$weights)
+               pc2_2$detail$weights,
+               pc2_3$detail$weights,
+               pc2_4$detail$weights,
+               pc2_5$detail$weights)
 
 res2 <- t(alts2)%*%t(pc2_0$detail$weights)
 
 incon2 <- rbind(pc2_1$summary$inconsistency, 
-               pc2_2$summary$inconsistency, 
-               pc2_3$summary$inconsistency, 
-               pc2_4$summary$inconsistency, 
-               pc2_5$summary$inconsistency) 
+                pc2_2$summary$inconsistency, 
+                pc2_3$summary$inconsistency, 
+                pc2_4$summary$inconsistency, 
+                pc2_5$summary$inconsistency) 
 ```
 
 Let's summarize the results in a few tables.
 
 ```{r}
 kbl(cbind(alts2, incon2, t(pc2_0$detail$weights)), 
-    booktabs=T, digits=5,
+    booktabs=T, digits=6,
     caption="Weights by Alternative",
     col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)", 
                   "Inconsistency",
-                  "Importance"))|> 
-kableExtra::kable_styling(latex_options =  "hold_position")
+                  "Importance"))
 ```
 
 These results show a number of interesting things:
 
-We can see that generally Med-El does well on each characteristic other than connectivity.
-
--   Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
--   The importance of the characteristics varies. The implant technology is permanent whereas the external processors can change over time with regular upgrades. Not surprisingly, the implant then gets the highest weight.
+-  We can see that generally Med-El does well on each characteristic other than connectivity.
+- Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
+- The importance of the characteristics varies. The implant technology is permanent whereas the external processors can change over time with regular upgrades. Not surprisingly, the implant then gets the highest weight.
 
 Now what we need to do is to combine the results by multiplying the performance on each characteristic by the importance.
 
@@ -294,8 +319,7 @@ colnames(res2) <- c("Alternatives")
 kbl(t(res2), 
     booktabs=T, digits=5,
     caption="Overall Score for Five Characteristic HDM Model",
-    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))|> 
-kableExtra::kable_styling(latex_options =  "hold_position")
+    col.names = c("Adv. Bionics (A)","Cochlear (B)", "Med-El (C)"))
 ```
 
 This analysis indicates that for this particular decision maker, the preferred alternative is **C** or to adopt the Med-El cochlear implant. Other decision makers will have different priorities for each characteristic, may develop a different decomposition in terms of characteristics, and assess the relative strengths of each alternative with respect to the characteristics differently.
@@ -305,11 +329,8 @@ This analysis indicates that for this particular decision maker, the preferred a
 This work could be extended in several directions.
 
 -   Refining the model in terms of characteristics.
-
 -   Applying HDM in place of AHP
-
 -   Testing the impact of AHP alternatives
-
 -   Verifying the model with other patients
-
 -   Gathering responses from other patients
+

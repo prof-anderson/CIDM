@@ -7,7 +7,7 @@ editor: visual
 
 # Cochlear Implant Decision Making
 
-This paper represents a set of notes on various aspects of cochlear implant decision making. As such, it shows a variety of methods and models.  This is made into a more targeted paper in CIDM2023.
+This paper represents a set of notes on various aspects of cochlear implant decision making. As such, it shows a variety of methods and models. This is made into a more targeted paper in CIDM2023.
 
 ## Introduction
 
@@ -371,7 +371,6 @@ pc2_2 <- pwc.weights(m2_2)
 pc2_2$detail$weights
 ```
 
-
 ```{r}
 d2_3 <- data.frame(A_B=c(45), A_C=c(10),    # Connectivity
                               B_C=c(12))
@@ -393,8 +392,6 @@ pc2_4 <- pwc.weights(m2_4)
 
 pc2_4$detail$weights
 ```
-
-
 
 ```{r}
 d2_5 <- data.frame(A_B=c(30), A_C=c(50),    # Clinic
@@ -423,7 +420,6 @@ incon2 <- rbind(pc2_1$summary$inconsistency,
                pc2_5$summary$inconsistency) 
 ```
 
-
 Let's summarize the results in a few tables.
 
 ```{r}
@@ -440,12 +436,10 @@ These results show a number of interesting things:
 
 We can see that Med-El generally well on each characteristic other than connectivity.
 
-- Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
-- The importance of the characteristics varies.  The implant technology is permanent whereas the external processors can change over time with regular upgrades.  Not surprisingly, the implant then gets the highest weight.
-
+-   Each of the pair-wise comparison matrices for characteristics had very low values of inconsistency suggesting that the decision maker is at least internally consistent.
+-   The importance of the characteristics varies. The implant technology is permanent whereas the external processors can change over time with regular upgrades. Not surprisingly, the implant then gets the highest weight.
 
 Now what we need to do is to combine the results by multiplying the performance on each characteristic by the importance.
-
 
 ```{r}
 res2 <- t(alts2)%*%t(pc2_0$detail$weights)
@@ -456,7 +450,7 @@ kbl(t(res2),
 kableExtra::kable_styling(latex_options =  "hold_position")
 ```
 
-This analysis indicates that for this particular decision maker, the preferred alternative is **C** or to adopt the Med-El cochlear implant. Other decision makers will have different priorities for each characteristic, may develop a different decomposition in terms of characteristics, and assess the relative strengths of each alternative with respect to the characteristics differently.  
+This analysis indicates that for this particular decision maker, the preferred alternative is **C** or to adopt the Med-El cochlear implant. Other decision makers will have different priorities for each characteristic, may develop a different decomposition in terms of characteristics, and assess the relative strengths of each alternative with respect to the characteristics differently.
 
 ## Future Work
 
