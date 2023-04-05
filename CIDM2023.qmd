@@ -42,6 +42,10 @@ The earlier PICMET paper used 8 characteristics divided into three categories:
     -   Future Implant Capability
     -   Warranty and Reliability
 
+In the seven years since the original analysis, the products from each vendor have changed significantly and the patient has more experiences.  The result is that some factors are no longer relevant while others could be reinterpreted.  For example, in 2016, company A's product had far better IP ratings.  In 2023, all three companies had similarly strong performance. Since there was no longer a significant difference in this factor, the patient no longer considered it a useful factor to include in the model.
+
+All three companies are approved by the US Food and Drug Administration, FDA, and generally have similar warranties.  
+
 ## Revised Model
 
 This paper simplifies the model to just four characteristics of a cochlear implant system.
@@ -49,7 +53,7 @@ This paper simplifies the model to just four characteristics of a cochlear impla
 -   **Implant:** Technology for internally implanted device's current capabilities. While anecdotal comments and studies do not appear to find clear differences in success outcomes by manufacturers, the technologies are different.
 -   **Flexibility:** Variety of benefits for the device, including flexibility such as off-the-ear versus on--the-ear for an alternative external processor. It is important to use the device and throughout the day to help the brain adapt to the new way of hearing. For users with eyeglasses and mask wearing, an off the ear processor option can be a very useful option.
 -   **Connectivity:** This reflects the general connectivity capabilities of the current processor(s) such as direct Bluetooth versus requiring additional devices, and Auracast (a newly announced multipoint Bluetooth capability).
--   **Community:** This factor is meant to capture both the community and company characteristics Each of the three companies have different philosophies and practices with respect to user communities, breadth of coverage across the hearing assistance industry, market share and more. This factor reflects how the community and company relate to the decision making process for the particular decision maker.\
+-   **Community:** This factor is meant to capture both the community and company characteristics Each of the three companies have different philosophies and practices with respect to user communities, breadth of coverage across the hearing assistance industry, market share and more. This factor reflects how the community and company relate to the decision making process for the particular decision maker. This factor also incorporates concerns about the longterm likelihood of the business being around and their reputation about ethical business practices.
 -   **Clinic:** While the surgeon will rule out alternatives that are not anatomically compatible with the patient as well as ones that they just don't support, there is a benefit to also using the company that the clinic, surgeon, and audiologists have the greatest familiarity with given the complexity of the technology.
 
 Some other factors to consider might include comfort for wearing, battery life, frequency of recalls, commitment to support out of warranty products, support community, familiarity of clinic/surgeon with the manufacturer.
@@ -58,7 +62,7 @@ Some other factors to consider might include comfort for wearing, battery life, 
 
 Just as there was in 2016, there are three United States FDA approved cochlear implant manufacturers: Advanced Bionics, Cochlear, and Med-El. The result is that for US patients, it typically is a choice between just these three manufacturers although sometimes one or two manufactures are not options due to patient's unique clinical characteristics, insurance coverage, or clinic limitations.
 
-The patient's decision is then two-fold, first whether to get a cochlear implant and secondly which manufacturer to select. A third decision could be which device to select since each manufacturer offers a standard behind-the-ear (BTE) device processor and then a secondary off-the-ear (OTE) processor option.
+The patient's decision is then two-fold, first whether to get a cochlear implant and secondly which manufacturer to select. A third decision could be which device to select since each manufacturer offers a standard behind-the-ear (BTE) device processor and then a secondary off-the-ear (OTE) processor option. Many US clinics are defined as two-processor clinics which means that the patient gets two processors. Most patients then choose both an OTE and BTE device to maximize their flexibility of choosing the processor that best fits their needs later.
 
 The processor devices are summarized below
 
@@ -136,11 +140,8 @@ source("HDM.R", local = knitr::knit_global())
 
 ### Evaluating Characteristics
 
-Kevin van Blommestein's R functions for doing DEA requires that the pair-wise comparison information is entered as a dataframe. The pair-wise comparison information is key to the analysis. To keep things straight, it is helpful to denote each of the 5 characteristics with a letter, which in our case with five characteristics means that we have A, B, C, D, and E. With 5 characteristics and doing a comparison, we will have *4+3+2+1=10* comparisons.
+Kevin van Blommestein's R functions for doing DEA requires that the pair-wise comparison information is entered as a dataframe. The pair-wise comparison information is key to the analysis. To keep things straight, it is helpful to denote each of the 5 characteristics with a letter, which in our case with five characteristics means that we have A, B, C, D, and E. With 5 characteristics and doing a comparison of each versus the others, we will have *4+3+2+1=10* comparisons.
 
-We have the `A_B=c(45)` has a lot of meaning that needs to be understood. First, it is representing a pair-wise comparison of A versus B. In our case, this is Implant vs. Flexibility and the number represents the points given the second item (B) on a 100 point scale. Therefore, the first item gets 100 minus that that. In the case of the Implant, `A_B=c(45)` means that *B* (or Flexibility) is given 45 points and *A* (or Implant) is given 55 points. This should be interpreted as A (Implant) being slightly more important than B (Flexibility).
-
-We repeat this process for all ten pair-wise comparisons.  We'll display the dataframe as code output since it isn't really meant to be user-friendly.
 
 ```{r}
 
@@ -163,6 +164,10 @@ d2_0 <- data.frame(A_B=c(45), A_C=c(30), A_D=c(30), A_E=c(40),
 #d2_0
 ```
 
+In the dataframe, we have as the first element `A_B=c(45)`. This has a lot of meaning that needs to be understood. First, it is representing a pair-wise comparison of A versus B. In our case, this is Implant vs. Flexibility and the number represents the points given the second item (B) on a 100 point scale. Therefore, the first item gets 100 minus that that. In the case of the Implant, `A_B=c(45)` means that *B* (or Flexibility) is given 45 points and *A* (or Implant) is given 55 points. This should be interpreted as A (Implant) being slightly more important than B (Flexibility).
+
+We repeat this process for all ten pair-wise comparisons.  We'll display the dataframe as code output since it isn't really meant to be user-friendly.
+
 If we had four experts and were trying to synthesize their perspectives, instead of `A_B=c(45)` we might have `A_B=c(45, 25, 30, 50)` where the second expert had a much stronger priority for characteristic A and the fourth expert had an equal priority for A and B.
 
 The pair-wise comparisons are then converted into a matrix.
@@ -181,6 +186,8 @@ kbl(m2_0$`1`,
 ```
 
 Note that the pair-wise comparison values we had earlier are just from the upper triangular portion of the matrix and the complement to these values are in the lower triangular part of the graph. This matrix is what is needed for analysis.
+
+Each comparison should be carefully considered. In this case, 
 
 We are now ready to call the function for doing the hierarchical decision modeling analysis.
 
